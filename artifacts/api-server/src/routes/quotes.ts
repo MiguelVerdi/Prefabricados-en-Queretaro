@@ -1,22 +1,11 @@
 import { ReplitConnectors } from "@replit/connectors-sdk";
 import { RequestQuoteBody, RequestQuoteResponse } from "@workspace/api-zod";
 import { Router, type IRouter } from "express";
-import rateLimit from "express-rate-limit";
 
 const router: IRouter = Router();
 const sendgrid = new ReplitConnectors();
 
-const quoteRateLimit = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  limit: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    error: "Se alcanzó el límite de solicitudes. Inténtalo de nuevo más tarde.",
-  },
-});
-
-router.post("/quotes", quoteRateLimit, async (req, res): Promise<void> => {
+router.post("/quotes", async (req, res): Promise<void> => {
   const parsed = RequestQuoteBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Revisa los datos del formulario." });

@@ -15,9 +15,15 @@ localPort = 23148
 run = "pnpm --filter @workspace/prefabricados-queretaro run dev"
 
 [services.production]
-build = [ "pnpm", "--filter", "@workspace/prefabricados-queretaro", "run", "build" ]
 serve = "static"
 publicDir = "artifacts/prefabricados-queretaro/dist/public"
+
+[services.production.build]
+args = [ "pnpm", "--filter", "@workspace/prefabricados-queretaro", "run", "build" ]
+
+[services.production.build.env]
+PORT = "23148"
+BASE_PATH = "/"
 
 [[services.production.rewrites]]
 from = "/*"
