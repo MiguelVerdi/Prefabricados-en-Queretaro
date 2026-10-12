@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Prefabricados en Querétaro"
+description = "Página informativa para encontrar productos prefabricados para construcción en Querétaro, México, con contenido inicial optimizado para búsquedas locales y preparado para incorporar el catálogo real."
+version = "1.0.0"
+id = "artifacts/prefabricados-queretaro"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23148
+
+[services.development]
+run = "pnpm --filter @workspace/prefabricados-queretaro run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/prefabricados-queretaro", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/prefabricados-queretaro/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23148"
+BASE_PATH = "/"
