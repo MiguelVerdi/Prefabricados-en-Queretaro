@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: quotes
+    description: Public quote request form
 paths:
   /healthz:
     get:
@@ -24,6 +26,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /quotes:
+    post:
+      operationId: requestQuote
+      tags: [quotes]
+      summary: Submit a quote request
+      description: Validates a quote request and sends it to the configured business inbox after human verification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteRequestInput"
+      responses:
+        "202":
+          description: Request accepted for delivery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteRequestResponse"
+        "400":
+          description: Invalid request or failed human verification
+        "429":
+          description: Too many quote requests
+        "503":
+          description: Email delivery is not configured or unavailable
 components:
   schemas:
     HealthStatus:
@@ -33,4 +60,58 @@ components:
           type: string
       required:
         - status
+    QuoteRequestInput:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        phone:
+          type: string
+          maxLength: 40
+        city:
+          type: string
+          minLength: 2
+          maxLength: 100
+        product:
+          type: string
+          minLength: 2
+          maxLength: 120
+        quantity:
+          type: string
+          maxLength: 100
+        message:
+          type: string
+          minLength: 10
+          maxLength: 2000
+        captchaToken:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        website:
+          type: string
+          maxLength: 200
+      required:
+        - name
+        - email
+        - city
+        - product
+        - message
+        - captchaToken
+    QuoteRequestResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+        - message
 

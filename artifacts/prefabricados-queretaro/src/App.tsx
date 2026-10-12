@@ -1,4 +1,22 @@
-import { ArrowRight, ArrowUpRight, ClipboardList, Layers3, MapPin } from 'lucide-react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useRequestQuote } from '@workspace/api-client-react';
+import { ArrowRight, ArrowUpRight, ClipboardList, Layers3, MapPin, Send } from 'lucide-react';
+
+declare global {
+  interface Window {
+    hcaptcha?: {
+      render: (container: HTMLElement, options: {
+        sitekey: string;
+        callback: (token: string) => void;
+        'expired-callback': () => void;
+        'error-callback': () => void;
+      }) => string;
+      reset: (widgetId?: string) => void;
+    };
+  }
+}
+
+const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY;
 
 function BrandMark() {
   return (
@@ -30,6 +48,209 @@ function ConstructionDiagram() {
   );
 }
 
+function QuoteRequestForm() {
+  const requestQuote = useRequestQuote();
+  const captchaContainer = useRef<HTMLDivElement>(null);
+  const captchaWidgetId = useRef<string | undefined>(undefined);
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaReady, setCaptchaReady] = useState(false);
+  const [captchaError, setCaptchaError] = useState('');
+  const [formError, setFormError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    if (!HCAPTCHA_SITE_KEY || !captchaContainer.current) return;
+
+    const renderWidget = () => {
+      if (!window.hcaptcha || !captchaContainer.current || captchaWidgetId.current) return;
+      captchaWidgetId.current = window.hcaptcha.render(captchaContainer.current, {
+        sitekey: HCAPTCHA_SITE_KEY,
+        callback: (token) => {
+          setCaptchaToken(token);
+          setCaptchaError('');
+        },
+        'expired-callback': () => setCaptchaToken(''),
+        'error-callback': () => {
+          setCaptchaToken('');
+          setCaptchaError('No fue posible verificar el captcha. Inténtalo de nuevo.');
+        },
+      });
+      setCaptchaReady(true);
+    };
+
+    if (window.hcaptcha) {
+      renderWidget();
+      return;
+    }
+
+    const existingScript = document.querySelector<HTMLScriptElement>('script[data-hcaptcha-script]');
+    const script = existingScript ?? document.createElement('script');
+    const onLoad = () => renderWidget();
+    script.addEventListener('load', onLoad);
+    if (!existingScript) {
+      script.src = 'https://js.hcaptcha.com/1/api.js?render=explicit';
+      script.async = true;
+      script.defer = true;
+      script.dataset.hcaptchaScript = 'true';
+      script.onerror = () => setCaptchaError('No se pudo cargar la verificación. Revisa tu conexión e inténtalo de nuevo.');
+      document.head.appendChild(script);
+    }
+    return () => script.removeEventListener('load', onLoad);
+  }, []);
+
+  const resetCaptcha = () => {
+    setCaptchaToken('');
+    if (captchaWidgetId.current) window.hcaptcha?.reset(captchaWidgetId.current);
+  };
+
+  const getErrorMessage = (error: unknown) => {
+    if (error && typeof error === 'object') {
+      const details = error as { status?: number; statusCode?: number; message?: string };
+      if (details.status === 429 || details.statusCode === 429) {
+        return 'Recibimos varias solicitudes en poco tiempo. Espera un momento y vuelve a intentarlo.';
+      }
+      if (details.message && /429|too many|rate limit/i.test(details.message)) {
+        return 'Recibimos varias solicitudes en poco tiempo. Espera un momento y vuelve a intentarlo.';
+      }
+    }
+    return 'No pudimos enviar tu solicitud en este momento. Revisa tu conexión e inténtalo de nuevo.';
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    setFormError('');
+    setSuccessMessage('');
+    if (!captchaToken) {
+      setCaptchaError('Completa la verificación antes de enviar tu solicitud.');
+      return;
+    }
+    const formData = new FormData(form);
+    const website = String(formData.get('website') ?? '');
+    // The server also checks this honeypot; don't send bot-filled submissions.
+    if (website) {
+      setSuccessMessage('Gracias. Recibimos tu solicitud.');
+      resetCaptcha();
+      return;
+    }
+    const data = {
+      name: String(formData.get('name') ?? '').trim(),
+      email: String(formData.get('email') ?? '').trim(),
+      phone: String(formData.get('phone') ?? '').trim(),
+      city: String(formData.get('city') ?? '').trim(),
+      product: String(formData.get('product') ?? '').trim(),
+      quantity: String(formData.get('quantity') ?? '').trim(),
+      message: String(formData.get('message') ?? '').trim(),
+      captchaToken,
+      website,
+    };
+    try {
+      const response = await requestQuote.mutateAsync({
+        data: {
+          ...data,
+          ...(data.phone ? { phone: data.phone } : {}),
+          ...(data.quantity ? { quantity: data.quantity } : {}),
+        },
+      });
+      if (!response.success) {
+        setFormError(response.message || 'No pudimos enviar tu solicitud. Inténtalo de nuevo.');
+        return;
+      }
+      setSuccessMessage(response.message || 'Gracias. Recibimos tu solicitud.');
+      form.reset();
+    } catch (error) {
+      setFormError(getErrorMessage(error));
+    } finally {
+      resetCaptcha();
+    }
+  };
+
+  return (
+    <section className="section quote-section" id="cotizacion" aria-labelledby="quote-heading" data-testid="quote-section">
+      <div className="quote-layout">
+        <div className="quote-intro">
+          <div className="eyebrow">Cuéntanos de tu proyecto</div>
+          <h2 id="quote-heading">Solicita información para tu obra.</h2>
+          <p>
+            Comparte qué producto buscas y algunos detalles de tu proyecto. La información específica
+            del catálogo aún está en preparación; puedes describir lo que necesitas en tu mensaje.
+          </p>
+          <div className="quote-aside">
+            <span className="quote-aside-mark"><MapPin aria-hidden="true" /></span>
+            <span><strong>Atención local</strong><small>Querétaro, México</small></span>
+          </div>
+        </div>
+
+        <form className="quote-form" onSubmit={handleSubmit} data-testid="quote-form">
+          <div className="form-heading">
+            <span className="panel-number">SOLICITUD / QRO</span>
+            <span className="required-note">* Campos obligatorios</span>
+          </div>
+          <div className="form-grid">
+            <div className="form-field">
+              <label htmlFor="quote-name">Nombre <span aria-hidden="true">*</span></label>
+              <input id="quote-name" name="name" autoComplete="name" minLength={2} maxLength={100} required data-testid="input-quote-name" />
+            </div>
+            <div className="form-field">
+              <label htmlFor="quote-email">Correo electrónico <span aria-hidden="true">*</span></label>
+              <input id="quote-email" name="email" type="email" autoComplete="email" maxLength={254} required data-testid="input-quote-email" />
+            </div>
+            <div className="form-field">
+              <label htmlFor="quote-phone">Teléfono <span className="optional-label">(opcional)</span></label>
+              <input id="quote-phone" name="phone" type="tel" autoComplete="tel" maxLength={40} data-testid="input-quote-phone" />
+            </div>
+            <div className="form-field">
+              <label htmlFor="quote-city">Ciudad <span aria-hidden="true">*</span></label>
+              <input id="quote-city" name="city" autoComplete="address-level2" minLength={2} maxLength={100} required data-testid="input-quote-city" />
+            </div>
+            <div className="form-field">
+              <label htmlFor="quote-product">Producto que buscas <span aria-hidden="true">*</span></label>
+              <input id="quote-product" name="product" minLength={2} maxLength={120} required aria-describedby="product-hint" data-testid="input-quote-product" />
+              <small id="product-hint">Describe el prefabricado que necesitas.</small>
+            </div>
+            <div className="form-field">
+              <label htmlFor="quote-quantity">Cantidad aproximada <span className="optional-label">(opcional)</span></label>
+              <input id="quote-quantity" name="quantity" maxLength={100} data-testid="input-quote-quantity" />
+            </div>
+            <div className="form-field form-field-wide">
+              <label htmlFor="quote-message">Detalles del proyecto o mensaje <span aria-hidden="true">*</span></label>
+              <textarea id="quote-message" name="message" minLength={10} maxLength={2000} rows={5} required aria-describedby="message-hint" data-testid="input-quote-message" />
+              <small id="message-hint">Incluye cualquier detalle que ayude a entender lo que necesitas.</small>
+            </div>
+          </div>
+          <div className="honeypot-field" aria-hidden="true">
+            <label htmlFor="quote-website">Sitio web</label>
+            <input id="quote-website" name="website" tabIndex={-1} autoComplete="off" data-testid="input-quote-website" />
+          </div>
+          <div className="captcha-area">
+            <div className="captcha-heading">
+              <strong>Verificación</strong>
+              <span>Ayúdanos a confirmar que eres una persona.</span>
+            </div>
+            {HCAPTCHA_SITE_KEY ? (
+              <div ref={captchaContainer} className="captcha-widget" data-testid="hcaptcha-widget" aria-label="Verificación hCaptcha" />
+            ) : (
+              <p className="captcha-config-note" data-testid="text-captcha-config">
+                La verificación estará disponible cuando se configure el sitio.
+              </p>
+            )}
+            {captchaError && <p className="form-feedback form-feedback-error" role="alert" data-testid="status-captcha-error">{captchaError}</p>}
+          </div>
+          <div className="form-submit-row">
+            <button className="quote-submit" type="submit" disabled={requestQuote.isPending || !HCAPTCHA_SITE_KEY || !captchaReady} data-testid="button-submit-quote">
+              {requestQuote.isPending ? 'Enviando solicitud…' : 'Enviar solicitud'}
+              <Send aria-hidden="true" />
+            </button>
+            <span className="privacy-note">Usaremos estos datos únicamente para atender tu solicitud.</span>
+          </div>
+          {formError && <p className="form-feedback form-feedback-error" role="alert" data-testid="status-quote-error">{formError}</p>}
+          {successMessage && <p className="form-feedback form-feedback-success" role="status" data-testid="status-quote-success">{successMessage}</p>}
+        </form>
+      </div>
+    </section>
+  );
+}
+
 function App() {
   return (
     <div className="site-shell">
@@ -44,7 +265,7 @@ function App() {
         <nav className="topnav" aria-label="Navegación principal">
           <a href="#oferta" data-testid="nav-oferta">La oferta</a>
           <a href="#catalogo" data-testid="nav-catalogo">Información de productos</a>
-          <a className="nav-cta" href="#ubicacion" data-testid="nav-local">Atención en Querétaro</a>
+          <a className="nav-cta" href="#cotizacion" data-testid="nav-local">Solicita información</a>
         </nav>
       </header>
 
@@ -174,6 +395,8 @@ function App() {
           </div>
         </section>
 
+        <QuoteRequestForm />
+
         <section className="closing" aria-label="Resumen de servicio" data-testid="closing-summary">
           <div className="closing-inner">
             <div>
@@ -181,7 +404,7 @@ function App() {
               <h2>Una referencia local para tu búsqueda.</h2>
               <p>Productos prefabricados para construcción. Más información próximamente.</p>
             </div>
-            <a className="closing-mark" href="#inicio" aria-label="Volver al inicio" data-testid="back-to-top">
+            <a className="closing-mark" href="#cotizacion" aria-label="Solicitar información" data-testid="closing-quote-link">
               <ArrowUpRight aria-hidden="true" />
             </a>
           </div>
