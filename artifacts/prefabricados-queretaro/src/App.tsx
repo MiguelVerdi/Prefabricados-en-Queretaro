@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRequestQuote } from '@workspace/api-client-react';
-import { ArrowRight, ArrowUpRight, ClipboardList, Layers3, MapPin, Send } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Layers3, MapPin, Send } from 'lucide-react';
 
 declare global {
   interface Window {
@@ -18,34 +18,27 @@ declare global {
 
 const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY;
 
-function BrandMark() {
-  return (
-    <span className="brand-mark" aria-hidden="true">
-      <Layers3 strokeWidth={1.7} />
-    </span>
-  );
-}
+const productPhotos = [
+  { name: 'IMG-20261012-WA0003.jpg', id: '1X8YTK_dBREnTDeUgRc7wyUEzRppohbWP', label: 'Armadura sobre elemento prefabricado', group: 'Elementos para losa' },
+  { name: 'IMG-20261012-WA0004.jpg', id: '15UtKRGNOnvniT45FrQPOCdY54zWVBlKz', label: 'Vista de conjunto en área de trabajo', group: 'Elementos para losa' },
+  { name: 'IMG-20261012-WA0005.jpg', id: '1xdXP02YEmPtMOp9RUvNlwgjQWlgyn45d', label: 'Detalle de piezas alineadas', group: 'Elementos para losa' },
+  { name: 'IMG-20261012-WA0006.jpg', id: '1yizq-EXGmdMKce0DqCtGWZFxqREKdpLZ', label: 'Acercamiento a la armadura', group: 'Elementos para losa' },
+  { name: 'IMG-20261012-WA0007.jpg', id: '1g3T0paFgJYTQy7kvsY9bdV769Xqkrynd', label: 'Detalle de fabricación', group: 'Elementos para losa' },
+  { name: 'IMG-20261012-WA0008.jpg', id: '1EuqFwK3E8nSUWOK40re1uV9nlvvjcwsB', label: 'Unión de armadura y base', group: 'Elementos para losa' },
+  { name: 'IMG-20261012-WA0009.jpg', id: '1z7ZRf8lUyNVdVckaV7HWY6TSqSXPsUPi', label: 'Piezas dispuestas en patio', group: 'Elementos para losa' },
+  { name: 'IMG-20261012-WA0010.jpg', id: '11xTZEdlNcXE7dxnS2a4_pStf4S_dSG8A', label: 'Elementos apilados', group: 'Elementos para losa' },
+  { name: 'IMG-20261012-WA0011.jpg', id: '16oV8G58C1x0qgKxOCJdNTO6DOPBWv3ga', label: 'Elementos en exterior', group: 'Elementos para losa' },
+  { name: 'IMG-20261012-WA0012.jpg', id: '1IWef4yiy2uOn44AaWUH3jaLnqpQMObUC', label: 'Preparación para traslado', group: 'Elementos para losa' },
+  { name: 'IMG-20261012-WA0013.jpg', id: '1sZ-WgLN-5WZLrQ_sHEQL87xXyq1-fKOZ', label: 'Vista cercana de piezas', group: 'Elementos para losa' },
+  { name: 'IMG-20261012-WA0014.jpg', id: '1fq157lXbT0KDKDa6Pon7C_iieesvvv4x', label: 'Piezas blancas apiladas', group: 'Piezas para construcción' },
+  { name: 'IMG-20261012-WA0015.jpg', id: '1LNE02HblZrqvuqWCa-xbOEDDYV1ekd0O', label: 'Detalle de piezas moldeadas', group: 'Piezas para construcción' },
+  { name: 'IMG-20261012-WA0016.jpg', id: '14wil90mh1eTzU3cAaaitwcgM7feByZBH', label: 'Piezas en espacio de resguardo', group: 'Piezas para construcción' },
+  { name: 'IMG-20261012-WA0017.jpg', id: '1ZpPuISRNtpFOVE_gbOtTt1JVObBgiF5v', label: 'Piezas apiladas', group: 'Piezas para construcción' },
+  { name: 'IMG-20261012-WA0018.jpg', id: '1X3vVvsXSvkShEaD3SyPiLzZi4-Ngn0Xq', label: 'Pieza individual', group: 'Piezas para construcción' },
+];
 
-function ConstructionDiagram() {
-  return (
-    <svg className="diagram" viewBox="0 0 460 330" fill="none" aria-hidden="true">
-      <path d="M56 262H396M83 278H370M103 294H349" stroke="#E9E1D1" strokeOpacity=".42" strokeWidth="1" />
-      <path d="M108 236V125L227 57L348 125V236H108Z" fill="#D8D3C2" fillOpacity=".12" stroke="#EEE7D8" strokeWidth="2" />
-      <path d="M108 125L227 193L348 125M227 193V57" stroke="#EEE7D8" strokeWidth="2" />
-      <path d="M138 142V225M168 159V225M198 176V225M257 176V225M287 159V225M317 142V225" stroke="#EEE7D8" strokeOpacity=".64" strokeWidth="1.5" />
-      <path d="M100 113L227 40L356 113M95 245H359" stroke="#E77B4C" strokeWidth="2" />
-      <path d="M82 113H61M82 245H61M68 119V239" stroke="#E77B4C" strokeWidth="1.4" />
-      <path d="M59 113L55 120M59 113L63 120M59 245L55 238M59 245L63 238" stroke="#E77B4C" strokeWidth="1.4" />
-      <path d="M374 125V236M367 125H382M367 236H382" stroke="#E77B4C" strokeWidth="1.4" />
-      <circle cx="68" cy="180" r="17" fill="#E77B4C" />
-      <path d="M63 180H73M68 175V185" stroke="white" strokeWidth="1.5" />
-      <text x="46" y="104" fill="#F3EBDD" fontFamily="monospace" fontSize="10" letterSpacing="1">A—01</text>
-      <text x="387" y="185" fill="#F3EBDD" fontFamily="monospace" fontSize="10" letterSpacing="1" transform="rotate(90 387 185)">REFERENCIA</text>
-      <path d="M124 251V260M332 251V260M124 256H332" stroke="#E77B4C" strokeWidth="1" />
-      <path d="M124 256L130 252M124 256L130 260M332 256L326 252M332 256L326 260" stroke="#E77B4C" strokeWidth="1" />
-      <text x="208" y="272" fill="#F3EBDD" fontFamily="monospace" fontSize="9" letterSpacing="1">ESQUEMA ILUSTRATIVO</text>
-    </svg>
-  );
+function BrandMark() {
+  return <span className="brand-mark" aria-hidden="true"><Layers3 strokeWidth={1.7} /></span>;
 }
 
 function QuoteRequestForm() {
@@ -169,16 +162,14 @@ function QuoteRequestForm() {
     <section className="section quote-section" id="cotizacion" aria-labelledby="quote-heading" data-testid="quote-section">
       <div className="quote-layout">
         <div className="quote-intro">
-          <div className="eyebrow">Cuéntanos de tu proyecto</div>
-          <h2 id="quote-heading">Solicita información para tu obra.</h2>
-          <p>
-            Comparte qué producto buscas y algunos detalles de tu proyecto. La información específica
-            del catálogo aún está en preparación; puedes describir lo que necesitas en tu mensaje.
-          </p>
+          <div className="eyebrow">Hablemos de tu obra</div>
+          <h2 id="quote-heading">Solicita una cotización.</h2>
+          <p>Cuéntanos qué estás buscando y en qué ciudad está tu proyecto. Te responderemos para revisar los detalles contigo.</p>
           <div className="quote-aside">
             <span className="quote-aside-mark"><MapPin aria-hidden="true" /></span>
-            <span><strong>Atención local</strong><small>Querétaro, México</small></span>
+            <span><strong>Atención en Querétaro</strong><small>Querétaro, México</small></span>
           </div>
+          <a className="quote-email" href="mailto:prefabricadoshuimilpan@gmail.com">prefabricadoshuimilpan@gmail.com</a>
         </div>
 
         <form className="quote-form" onSubmit={handleSubmit} data-testid="quote-form">
@@ -254,116 +245,129 @@ function QuoteRequestForm() {
 function App() {
   return (
     <div className="site-shell">
+      <div className="utility-bar" data-testid="site-contact-bar">
+        <span>Prefabricados para construcción en Querétaro</span>
+        <a href="mailto:prefabricadoshuimilpan@gmail.com" data-testid="utility-email">
+          prefabricadoshuimilpan@gmail.com
+        </a>
+      </div>
       <header className="topbar" data-testid="site-header">
         <a className="brand" href="#inicio" aria-label="Prefabricados en Querétaro, inicio" data-testid="brand-home">
           <BrandMark />
-          <span className="brand-name">
-            Prefabricados
-            <small>Querétaro · Construcción</small>
-          </span>
+          <span className="brand-name">Prefabricados<small>Querétaro · Construcción</small></span>
         </a>
         <nav className="topnav" aria-label="Navegación principal">
-          <a href="#oferta" data-testid="nav-oferta">La oferta</a>
-          <a href="#catalogo" data-testid="nav-catalogo">Información de productos</a>
-          <a className="nav-cta" href="#cotizacion" data-testid="nav-local">Solicita información</a>
+          <a href="#oferta" data-testid="nav-oferta">Qué ofrecemos</a>
+          <a href="#catalogo" data-testid="nav-catalogo">Productos</a>
+          <a className="nav-cta" href="#cotizacion" data-testid="nav-local">Pedir cotización</a>
         </nav>
       </header>
 
       <main>
         <section className="hero" id="inicio" aria-labelledby="main-heading" data-testid="hero">
           <div className="hero-content">
-            <div className="eyebrow reveal">Materiales para avanzar</div>
-            <h1 className="reveal-delay" id="main-heading">
-              Prefabricados en <span>Querétaro</span>
-            </h1>
+            <div className="eyebrow reveal">Prefabricados · Querétaro</div>
+            <h1 className="reveal-delay" id="main-heading">Materiales para <span>construir.</span></h1>
             <p className="hero-copy reveal-delay">
-              Un punto de partida local para encontrar prefabricados para construcción en Querétaro.
-              Información clara para profesionales de obra, sin rodeos.
+              Elementos prefabricados para profesionales de obra. Conoce parte de nuestra oferta y cuéntanos qué necesita tu proyecto.
             </p>
             <div className="hero-actions">
-              <a className="button-primary" href="#oferta" data-testid="hero-offer-link">
-                Conoce la oferta <ArrowRight aria-hidden="true" />
+              <a className="button-primary" href="#cotizacion" data-testid="hero-offer-link">
+                Solicitar cotización <ArrowRight aria-hidden="true" />
               </a>
-              <span className="hero-note">Suministro local · Querétaro, México</span>
+              <span className="hero-note">Atención local · Querétaro, México</span>
             </div>
           </div>
-          <div className="visual-wrap" aria-label="Esquema arquitectónico ilustrativo">
-            <div className="visual-plate">
-              <ConstructionDiagram />
-              <span className="plate-label">Construcción · Prefabricados</span>
+          <div className="hero-photo" aria-label="Elementos prefabricados fotografiados en el área de trabajo">
+            <img
+              src="https://drive.google.com/thumbnail?id=1X8YTK_dBREnTDeUgRc7wyUEzRppohbWP&sz=w1600"
+              alt="Elementos prefabricados con armadura expuestos en un patio de trabajo"
+              fetchPriority="high"
+            />
+            <span className="photo-index">FOTO DE PRODUCTO</span>
+            <div className="photo-caption">
+              <strong>Prefabricados vistos de cerca, en el trabajo real.</strong>
+              <span>Registro fotográfico</span>
             </div>
-            <div className="visual-index">QRO / 01</div>
-            <div className="visual-caption"><span className="caption-dot" />Referencia gráfica, no a escala</div>
+            <span className="hero-photo-frame" aria-hidden="true" />
           </div>
         </section>
 
         <aside className="local-band" id="ubicacion" data-testid="local-coverage">
-          <strong className="local-marker"><MapPin aria-hidden="true" /> Un proveedor local para tus proyectos</strong>
-          <span>Querétaro, México</span>
+          <strong className="local-marker"><MapPin aria-hidden="true" /> Un contacto local para tus proyectos</strong>
+          <span>Querétaro · México</span>
         </aside>
 
         <section className="section" id="oferta" aria-labelledby="offer-heading" data-testid="offer-section">
           <div className="section-inner">
             <div className="section-heading">
-              <div className="eyebrow">Qué encontrarás aquí</div>
+              <div className="eyebrow">Una oferta para obra</div>
               <div>
-                <h2 id="offer-heading">Prefabricados para construcción en <em>un solo lugar.</em></h2>
-                <p>
-                  Este negocio vende productos prefabricados para construcción en Querétaro.
-                  La página está pensada para que constructores y profesionales ubiquen rápido
-                  el tipo de proveedor que buscan.
-                </p>
+                <h2 id="offer-heading">Lo que buscas para construir, <em>empieza aquí.</em></h2>
+                <p>Somos un negocio local de venta de productos prefabricados para construcción. Si tienes un requerimiento específico, consúltanos directamente.</p>
               </div>
             </div>
             <div className="offer-grid">
               <article className="offer-panel primary-panel" data-testid="offer-overview">
                 <div className="panel-topline">
-                  <span className="panel-number">01 / OFERTA</span>
+                  <span className="panel-number">01 / MATERIALES</span>
                   <span className="panel-tag">Para profesionales de obra</span>
                 </div>
-                <h3>Soluciones prefabricadas para construcción</h3>
-                <p>
-                  Un proveedor local de prefabricados en Querétaro. Consulta aquí la información
-                  general mientras preparamos los detalles de cada producto.
-                </p>
+                <h3>Elementos prefabricados para construcción</h3>
+                <p>Consulta por piezas con armadura para sistemas de losa y otros elementos que aparecen en nuestras fotografías. Confirmamos contigo los detalles del producto que requieres.</p>
                 <div className="panel-rule" />
-                <div className="panel-foot">
-                  <span>Enfoque local</span><span>Información en preparación</span>
-                </div>
+                <div className="panel-foot"><span>Atención directa</span><span>Querétaro, México</span></div>
               </article>
               <article className="offer-panel" data-testid="offer-for-buyers">
                 <div className="panel-topline">
-                  <span className="panel-number">02 / PARA TU OBRA</span>
-                  <span className="panel-tag">Consulta directa</span>
+                  <span className="panel-number">02 / PARA TU PROYECTO</span>
+                  <span className="panel-tag">Consulta disponibilidad</span>
                 </div>
-                <h3>Primero, ubica lo que necesitas</h3>
-                <p>
-                  Si estás buscando prefabricados para una obra, la información de producto se
-                  incorporará en una próxima actualización para ayudarte a revisar la oferta con más detalle.
-                </p>
+                <h3>Revisemos juntos lo que necesitas</h3>
+                <p>Comparte el producto, la ciudad de tu obra y cualquier referencia que tengas. Te contactaremos para conversar sobre tu solicitud.</p>
                 <div className="panel-rule" />
-                <div className="panel-foot">
-                  <span>Sin datos por confirmar</span><span>Próxima actualización</span>
-                </div>
+                <div className="panel-foot"><span>Sin precios publicados</span><span>Cotización personalizada</span></div>
               </article>
             </div>
           </div>
         </section>
 
-        <section className="section catalog-section" id="catalogo" aria-labelledby="catalog-heading" data-testid="catalog-section">
+        <section className="section gallery-section" id="catalogo" aria-labelledby="catalog-heading" data-testid="catalog-section">
+          <div className="gallery-top">
+            <div>
+              <div className="eyebrow">Fotografías de producto</div>
+              <h2 id="catalog-heading">Así se ven en persona.</h2>
+            </div>
+            <p>Imágenes compartidas por el negocio. Para confirmar el nombre y las especificaciones de cada pieza, consulta directamente.</p>
+          </div>
+          <div className="gallery" aria-label="Galería de productos prefabricados">
+            {productPhotos.map((photo, index) => (
+              <figure className="gallery-item" key={photo.id} data-testid={`product-photo-${index + 1}`}>
+                <img
+                  src={`https://drive.google.com/thumbnail?id=${photo.id}&sz=w1600`}
+                  alt={photo.label}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                />
+                <figcaption className="gallery-caption">
+                  <strong>{photo.label}</strong>
+                  <span>{photo.group}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+          <p className="gallery-note">Las imágenes son referencias visuales; pregunta por características y especificaciones del producto.</p>
+        </section>
+
+        <section className="section catalog-section" aria-labelledby="catalog-status-heading">
           <div className="catalog-card">
             <div className="catalog-copy">
-              <div className="eyebrow">Catálogo en preparación</div>
-              <h2 id="catalog-heading">La información detallada viene en camino.</h2>
-              <p>
-                El catálogo y las fichas de producto se están preparando y se agregarán en una
-                próxima actualización. Por ahora, aquí puedes identificar el enfoque: venta de
-                prefabricados para construcción en Querétaro.
-              </p>
+              <div className="eyebrow">Información clara</div>
+              <h2 id="catalog-status-heading">Cada obra tiene sus propios requerimientos.</h2>
+              <p>Por eso no publicamos medidas, precios ni disponibilidad sin confirmarlos. Envíanos los datos de tu proyecto y revisamos contigo la solicitud.</p>
             </div>
-            <div className="catalog-status" data-testid="catalog-status" aria-label="Catálogo en preparación">
-              <ClipboardList aria-hidden="true" />
-              <span>En preparación</span>
+            <div className="catalog-status" data-testid="catalog-status" aria-label="Consulta directa para confirmar producto">
+              <Layers3 aria-hidden="true" />
+              <span>Consulta directa</span>
             </div>
           </div>
         </section>
@@ -371,25 +375,25 @@ function App() {
         <section className="section buyer-section" aria-labelledby="buyer-heading" data-testid="buyer-section">
           <div className="section-inner">
             <div className="buyer-intro">
-              <div className="eyebrow">Claro desde el inicio</div>
-              <h2 id="buyer-heading">Lo esencial para decidir si seguir.</h2>
-              <p>Una visita útil empieza con información directa. Esto es lo que ya puedes saber:</p>
+              <div className="eyebrow">Directo al punto</div>
+              <h2 id="buyer-heading">Pide información con lo esencial.</h2>
+              <p>Para revisar tu solicitud, comparte algunos datos de la obra y el material que estás buscando.</p>
             </div>
             <div className="buyer-steps">
               <article className="buyer-step">
                 <span className="step-num">01 — UBICACIÓN</span>
-                <h3>Querétaro, México</h3>
-                <p>La oferta está dirigida a quienes buscan un proveedor local de prefabricados en Querétaro.</p>
+                <h3>¿Dónde está tu proyecto?</h3>
+                <p>Indica la ciudad para que podamos entender el contexto de tu solicitud.</p>
               </article>
               <article className="buyer-step">
-                <span className="step-num">02 — ENFOQUE</span>
-                <h3>Productos para construcción</h3>
-                <p>El negocio se dedica a vender productos prefabricados para construcción.</p>
+                <span className="step-num">02 — PRODUCTO</span>
+                <h3>¿Qué necesitas?</h3>
+                <p>Escribe el tipo de pieza o comparte una referencia en el mensaje.</p>
               </article>
               <article className="buyer-step">
-                <span className="step-num">03 — SIGUIENTE PASO</span>
-                <h3>Detalles en próxima actualización</h3>
-                <p>El catálogo y la información específica de productos están en preparación.</p>
+                <span className="step-num">03 — DETALLES</span>
+                <h3>Cuéntanos sobre la obra</h3>
+                <p>Agrega cualquier información que nos ayude a comprender el requerimiento.</p>
               </article>
             </div>
           </div>
@@ -401,10 +405,10 @@ function App() {
           <div className="closing-inner">
             <div>
               <div className="eyebrow">Prefabricados · Querétaro</div>
-              <h2>Una referencia local para tu búsqueda.</h2>
-              <p>Productos prefabricados para construcción. Más información próximamente.</p>
+              <h2>¿Qué necesita tu obra?</h2>
+              <p>Cuéntanos del proyecto. Revisamos contigo los detalles de tu solicitud.</p>
             </div>
-            <a className="closing-mark" href="#cotizacion" aria-label="Solicitar información" data-testid="closing-quote-link">
+            <a className="closing-mark" href="#cotizacion" aria-label="Solicitar cotización" data-testid="closing-quote-link">
               <ArrowUpRight aria-hidden="true" />
             </a>
           </div>
@@ -413,8 +417,8 @@ function App() {
 
       <footer className="footer" data-testid="site-footer">
         <p>Prefabricados en Querétaro</p>
-        <a href="#inicio" data-testid="footer-home">Volver al inicio ↑</a>
-        <p>Información general · Catálogo en preparación</p>
+        <a href="#inicio" data-testid="footer-home">Volver al inicio</a>
+        <a href="mailto:prefabricadoshuimilpan@gmail.com">prefabricadoshuimilpan@gmail.com</a>
       </footer>
     </div>
   );
