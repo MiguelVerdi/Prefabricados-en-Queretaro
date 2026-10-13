@@ -22,6 +22,10 @@ declare global {
 const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY;
 const BUSINESS_EMAIL = 'prefabricadoshuimilpan@gmail.com';
 const BUSINESS_PHONE = '4428228310';
+const BUSINESS_ADDRESS = 'C. 27 830, Lomas de Casa Blanca, 76080 Santiago de Querétaro, Qro., México';
+const MAPS_QUERY = encodeURIComponent(BUSINESS_ADDRESS);
+const GOOGLE_MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${MAPS_QUERY}`;
+const GOOGLE_MAPS_EMBED_URL = `https://www.google.com/maps?q=${MAPS_QUERY}&z=16&output=embed`;
 const WHATSAPP_URL = `https://wa.me/52${BUSINESS_PHONE}?text=${encodeURIComponent('Hola, vi su página de Prefabricados Huimilpan. Me gustaría recibir información y una cotización sobre sus productos.')}`;
 
 const productPhotos = [
@@ -351,7 +355,7 @@ function App() {
           </div>
         </section>
 
-        <aside className="local-band" id="ubicacion" data-testid="local-coverage">
+        <aside className="local-band" data-testid="local-coverage">
           <strong className="local-marker"><MapPin aria-hidden="true" /> Productos prefabricados para construcción</strong>
           <span>Semivigueta · Bovedilla · Casetón · Unicel · Poste</span>
         </aside>
@@ -422,6 +426,30 @@ function App() {
                 <FaWhatsapp aria-hidden="true" />
                 <span><small>WhatsApp</small>Enviar mensaje</span>
               </a>
+            </div>
+          </div>
+          <div className="location-panel" id="ubicacion" aria-labelledby="location-heading" data-testid="business-location">
+            <div className="location-info">
+              <div className="eyebrow">Ubicación</div>
+              <h3 id="location-heading">Encuéntranos en Querétaro</h3>
+              <address className="business-address">
+                <MapPin aria-hidden="true" />
+                <span>{BUSINESS_ADDRESS}</span>
+              </address>
+              <a className="maps-link" href={GOOGLE_MAPS_URL} target="_blank" rel="noopener noreferrer">
+                <MapPin aria-hidden="true" />
+                Ver ubicación en Google Maps
+                <ArrowUpRight aria-hidden="true" />
+              </a>
+            </div>
+            <div className="location-map">
+              <iframe
+                title="Mapa de Prefabricados Huimilpan en Lomas de Casa Blanca, Querétaro"
+                src={GOOGLE_MAPS_EMBED_URL}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
             </div>
           </div>
         </section>
