@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRequestQuote } from '@workspace/api-client-react';
-import { ArrowRight, ArrowUpRight, Layers3, MapPin, Send } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, MapPin, Phone, Send } from 'lucide-react';
 
 declare global {
   interface Window {
@@ -13,10 +13,14 @@ declare global {
       }) => string;
       reset: (widgetId?: string) => void;
     };
+    hcaptchaApiReady?: boolean;
+    onHcaptchaApiLoad?: () => void;
   }
 }
 
 const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY;
+const BUSINESS_EMAIL = 'prefabricadoshuimilpan@gmail.com';
+const BUSINESS_PHONE = '4428228310';
 
 const productPhotos = [
   { name: 'IMG-20261012-WA0003.jpg', id: '1X8YTK_dBREnTDeUgRc7wyUEzRppohbWP', label: 'Armadura sobre elemento prefabricado', group: 'Elementos para losa' },
@@ -37,9 +41,44 @@ const productPhotos = [
   { name: 'IMG-20261012-WA0018.jpg', id: '1X3vVvsXSvkShEaD3SyPiLzZi4-Ngn0Xq', label: 'Pieza individual', group: 'Piezas para construcción' },
 ];
 
-function BrandMark() {
-  return <span className="brand-mark" aria-hidden="true"><Layers3 strokeWidth={1.7} /></span>;
-}
+const products = [
+  {
+    name: 'Semivigueta',
+    category: 'Sistema de losa',
+    description: 'Elemento prefabricado de concreto reforzado con armadura de acero. Se utiliza como soporte estructural en losas aligeradas junto con bovedillas.',
+    specifications: ['Longitudes de 1 a 6 m', 'Peraltes de 15–20'],
+  },
+  {
+    name: 'Bovedilla de poliestireno',
+    category: 'Sistema de losa · Unicel',
+    description: 'Pieza ligera de poliestireno expandido que se coloca entre semiviguetas para reducir el peso propio de la losa y aportar aislamiento térmico.',
+    specifications: ['1.2 × 0.63 × 0.15', '1.2 × 0.63 × 0.20', 'Densidades 10 y 11 · medidas especiales'],
+  },
+  {
+    name: 'Bovedilla de concreto',
+    category: 'Sistema de losa',
+    description: 'Pieza prefabricada que se coloca entre semiviguetas como elemento de relleno, aligerando la losa y reduciendo el concreto necesario.',
+    specifications: ['Medida indicada: 15 × 25 × 75'],
+  },
+  {
+    name: 'Casetón de poliestireno',
+    category: 'Losas reticulares · Térmico',
+    description: 'Elemento de poliestireno expandido para aligerar losas reticulares o nervadas y formar espacios entre las nervaduras de concreto.',
+    specifications: ['15 × 40 × 40 · 20 × 40 × 40 · 25 × 40 × 40', '20 × 50 × 50 · 25 × 50 × 50 · 20 × 60 × 60', 'Densidad 8 · medidas especiales'],
+  },
+  {
+    name: 'Placa de poliestireno (unicel)',
+    category: 'Aislamiento térmico',
+    description: 'Panel ligero que se usa como aislante térmico y material de relleno en muros, techos, plafones y otros sistemas constructivos.',
+    specifications: ['1.2 × 2 × .4 × 1″', '1.2 × 2 × .4 × 2″', 'Medidas especiales'],
+  },
+  {
+    name: 'Poste para cercar',
+    category: 'Prefabricado de concreto',
+    description: 'Elemento de concreto reforzado para colocar malla ciclónica, alambre de púas o alambre galvanizado y delimitar terrenos.',
+    specifications: ['Sección de 10 × 10 cm', 'Longitudes de 2 m y 2.4 m'],
+  },
+];
 
 function QuoteRequestForm() {
   const requestQuote = useRequestQuote();
@@ -56,39 +95,50 @@ function QuoteRequestForm() {
 
     const renderWidget = () => {
       if (!window.hcaptcha || !captchaContainer.current || captchaWidgetId.current) return;
-      captchaWidgetId.current = window.hcaptcha.render(captchaContainer.current, {
-        sitekey: HCAPTCHA_SITE_KEY,
-        callback: (token) => {
-          setCaptchaToken(token);
-          setCaptchaError('');
-        },
-        'expired-callback': () => setCaptchaToken(''),
-        'error-callback': () => {
-          setCaptchaToken('');
-          setCaptchaError('No fue posible verificar el captcha. Inténtalo de nuevo.');
-        },
-      });
-      setCaptchaReady(true);
+      try {
+        captchaWidgetId.current = window.hcaptcha.render(captchaContainer.current, {
+          sitekey: HCAPTCHA_SITE_KEY,
+          callback: (token) => {
+            setCaptchaToken(token);
+            setCaptchaError('');
+          },
+          'expired-callback': () => setCaptchaToken(''),
+          'error-callback': () => {
+            setCaptchaToken('');
+            setCaptchaError('No fue posible verificar el captcha. Inténtalo de nuevo.');
+          },
+        });
+        setCaptchaReady(true);
+      } catch {
+        setCaptchaError('No se pudo iniciar la verificación. Recarga la página e inténtalo de nuevo.');
+      }
     };
 
-    if (window.hcaptcha) {
+    if (window.hcaptcha && window.hcaptchaApiReady) {
       renderWidget();
       return;
     }
 
     const existingScript = document.querySelector<HTMLScriptElement>('script[data-hcaptcha-script]');
     const script = existingScript ?? document.createElement('script');
-    const onLoad = () => renderWidget();
-    script.addEventListener('load', onLoad);
+    const onApiLoad = () => {
+      window.hcaptchaApiReady = true;
+      renderWidget();
+    };
+    window.onHcaptchaApiLoad = onApiLoad;
     if (!existingScript) {
-      script.src = 'https://js.hcaptcha.com/1/api.js?render=explicit';
+      script.src = 'https://js.hcaptcha.com/1/api.js?onload=onHcaptchaApiLoad&render=explicit';
       script.async = true;
       script.defer = true;
       script.dataset.hcaptchaScript = 'true';
       script.onerror = () => setCaptchaError('No se pudo cargar la verificación. Revisa tu conexión e inténtalo de nuevo.');
       document.head.appendChild(script);
+    } else if (window.hcaptcha && window.hcaptchaApiReady) {
+      renderWidget();
     }
-    return () => script.removeEventListener('load', onLoad);
+    return () => {
+      if (window.onHcaptchaApiLoad === onApiLoad) window.onHcaptchaApiLoad = undefined;
+    };
   }, []);
 
   const resetCaptcha = () => {
@@ -164,12 +214,13 @@ function QuoteRequestForm() {
         <div className="quote-intro">
           <div className="eyebrow">Hablemos de tu obra</div>
           <h2 id="quote-heading">Solicita una cotización.</h2>
-          <p>Cuéntanos qué estás buscando y en qué ciudad está tu proyecto. Te responderemos para revisar los detalles contigo.</p>
+          <p>Indícanos qué prefabricado necesitas, las medidas y la ciudad de tu proyecto. Te responderemos para revisar los detalles contigo.</p>
           <div className="quote-aside">
             <span className="quote-aside-mark"><MapPin aria-hidden="true" /></span>
             <span><strong>Atención en Querétaro</strong><small>Querétaro, México</small></span>
           </div>
-          <a className="quote-email" href="mailto:prefabricadoshuimilpan@gmail.com">prefabricadoshuimilpan@gmail.com</a>
+          <a className="quote-phone" href={`tel:+52${BUSINESS_PHONE}`}><Phone aria-hidden="true" /> 442 822 8310</a>
+          <a className="quote-email" href={`mailto:${BUSINESS_EMAIL}`}>{BUSINESS_EMAIL}</a>
         </div>
 
         <form className="quote-form" onSubmit={handleSubmit} data-testid="quote-form">
@@ -196,8 +247,11 @@ function QuoteRequestForm() {
             </div>
             <div className="form-field">
               <label htmlFor="quote-product">Producto que buscas <span aria-hidden="true">*</span></label>
-              <input id="quote-product" name="product" minLength={2} maxLength={120} required aria-describedby="product-hint" data-testid="input-quote-product" />
-              <small id="product-hint">Describe el prefabricado que necesitas.</small>
+              <input id="quote-product" name="product" list="quote-products" placeholder="Ej. semivigueta o casetón" minLength={2} maxLength={120} required aria-describedby="product-hint" data-testid="input-quote-product" />
+              <datalist id="quote-products">
+                {products.map((product) => <option key={product.name} value={product.name} />)}
+              </datalist>
+              <small id="product-hint">Puedes elegir un producto o escribir una medida especial.</small>
             </div>
             <div className="form-field">
               <label htmlFor="quote-quantity">Cantidad aproximada <span className="optional-label">(opcional)</span></label>
@@ -246,19 +300,20 @@ function App() {
   return (
     <div className="site-shell">
       <div className="utility-bar" data-testid="site-contact-bar">
-        <span>Prefabricados para construcción en Querétaro</span>
-        <a href="mailto:prefabricadoshuimilpan@gmail.com" data-testid="utility-email">
-          prefabricadoshuimilpan@gmail.com
-        </a>
+        <span>Prefabricados Huimilpan · Construcción en Querétaro</span>
+        <div className="utility-contacts">
+          <a href={`tel:+52${BUSINESS_PHONE}`} data-testid="utility-phone"><Phone aria-hidden="true" />442 822 8310</a>
+          <a href={`mailto:${BUSINESS_EMAIL}`} data-testid="utility-email">{BUSINESS_EMAIL}</a>
+        </div>
       </div>
       <header className="topbar" data-testid="site-header">
-        <a className="brand" href="#inicio" aria-label="Prefabricados en Querétaro, inicio" data-testid="brand-home">
-          <BrandMark />
-          <span className="brand-name">Prefabricados<small>Querétaro · Construcción</small></span>
+        <a className="brand" href="#inicio" aria-label="Prefabricados Huimilpan, inicio" data-testid="brand-home">
+          <img className="brand-logo" src="/logo-ph.jpeg" alt="Logo de Prefabricados Huimilpan: Vigueta y Bovedilla" width="56" height="56" />
+          <span className="brand-name">Prefabricados Huimilpan<small>Vigueta · Bovedilla · Querétaro</small></span>
         </a>
         <nav className="topnav" aria-label="Navegación principal">
-          <a href="#oferta" data-testid="nav-oferta">Qué ofrecemos</a>
-          <a href="#catalogo" data-testid="nav-catalogo">Productos</a>
+          <a href="#productos" data-testid="nav-catalogo">Productos</a>
+          <a href="#contacto" data-testid="nav-contacto">Contacto</a>
           <a className="nav-cta" href="#cotizacion" data-testid="nav-local">Pedir cotización</a>
         </nav>
       </header>
@@ -266,15 +321,16 @@ function App() {
       <main>
         <section className="hero" id="inicio" aria-labelledby="main-heading" data-testid="hero">
           <div className="hero-content">
-            <div className="eyebrow reveal">Prefabricados · Querétaro</div>
-            <h1 className="reveal-delay" id="main-heading">Materiales para <span>construir.</span></h1>
+            <div className="eyebrow reveal">Prefabricados Huimilpan · Querétaro</div>
+            <h1 className="reveal-delay" id="main-heading">Prefabricados para <span>tu obra.</span></h1>
             <p className="hero-copy reveal-delay">
-              Elementos prefabricados para profesionales de obra. Conoce parte de nuestra oferta y cuéntanos qué necesita tu proyecto.
+              Semivigueta, bovedillas, casetón, placa de unicel y postes para cercar. Consulta medidas y pide una cotización para tu obra en Querétaro.
             </p>
             <div className="hero-actions">
               <a className="button-primary" href="#cotizacion" data-testid="hero-offer-link">
                 Solicitar cotización <ArrowRight aria-hidden="true" />
               </a>
+              <a className="button-secondary" href="#productos" data-testid="hero-catalog-link">Ver productos</a>
               <span className="hero-note">Atención local · Querétaro, México</span>
             </div>
           </div>
@@ -294,51 +350,43 @@ function App() {
         </section>
 
         <aside className="local-band" id="ubicacion" data-testid="local-coverage">
-          <strong className="local-marker"><MapPin aria-hidden="true" /> Un contacto local para tus proyectos</strong>
-          <span>Querétaro · México</span>
+          <strong className="local-marker"><MapPin aria-hidden="true" /> Productos prefabricados para construcción</strong>
+          <span>Semivigueta · Bovedilla · Casetón · Unicel · Poste</span>
         </aside>
 
-        <section className="section" id="oferta" aria-labelledby="offer-heading" data-testid="offer-section">
-          <div className="section-inner">
-            <div className="section-heading">
-              <div className="eyebrow">Una oferta para obra</div>
-              <div>
-                <h2 id="offer-heading">Lo que buscas para construir, <em>empieza aquí.</em></h2>
-                <p>Somos un negocio local de venta de productos prefabricados para construcción. Si tienes un requerimiento específico, consúltanos directamente.</p>
-              </div>
+        <section className="section products-section" id="productos" aria-labelledby="products-heading" data-testid="products-section">
+          <div className="products-inner">
+            <div className="products-heading">
+              <div className="eyebrow">Catálogo de productos</div>
+              <h2 id="products-heading">Prefabricados para losas, aislamiento y cercado.</h2>
+              <p>Consulta los productos y medidas que manejamos. Para confirmar disponibilidad o cotizar medidas especiales, contáctanos directamente.</p>
             </div>
-            <div className="offer-grid">
-              <article className="offer-panel primary-panel" data-testid="offer-overview">
-                <div className="panel-topline">
-                  <span className="panel-number">01 / MATERIALES</span>
-                  <span className="panel-tag">Para profesionales de obra</span>
-                </div>
-                <h3>Elementos prefabricados para construcción</h3>
-                <p>Consulta por piezas con armadura para sistemas de losa y otros elementos que aparecen en nuestras fotografías. Confirmamos contigo los detalles del producto que requieres.</p>
-                <div className="panel-rule" />
-                <div className="panel-foot"><span>Atención directa</span><span>Querétaro, México</span></div>
-              </article>
-              <article className="offer-panel" data-testid="offer-for-buyers">
-                <div className="panel-topline">
-                  <span className="panel-number">02 / PARA TU PROYECTO</span>
-                  <span className="panel-tag">Consulta disponibilidad</span>
-                </div>
-                <h3>Revisemos juntos lo que necesitas</h3>
-                <p>Comparte el producto, la ciudad de tu obra y cualquier referencia que tengas. Te contactaremos para conversar sobre tu solicitud.</p>
-                <div className="panel-rule" />
-                <div className="panel-foot"><span>Sin precios publicados</span><span>Cotización personalizada</span></div>
-              </article>
+            <div className="products-grid">
+              {products.map((product, index) => (
+                <article className="product-card" key={product.name} data-testid={`product-card-${index + 1}`}>
+                  <div className="product-category">{product.category}</div>
+                  <h3>{product.name}</h3>
+                  <p>{product.description}</p>
+                  <ul className="product-specifications">
+                    {product.specifications.map((specification) => <li key={specification}>{specification}</li>)}
+                  </ul>
+                  <a className="product-quote-link" href="#cotizacion" aria-label={`Solicitar cotización de ${product.name}`}>
+                    Cotizar este producto <ArrowRight aria-hidden="true" />
+                  </a>
+                </article>
+              ))}
             </div>
+            <p className="product-measure-note">Las medidas y densidades se muestran como fueron proporcionadas por el negocio. Confirma unidades y disponibilidad al solicitar tu cotización.</p>
           </div>
         </section>
 
-        <section className="section gallery-section" id="catalogo" aria-labelledby="catalog-heading" data-testid="catalog-section">
+        <section className="section gallery-section" id="galeria" aria-labelledby="catalog-heading" data-testid="catalog-section">
           <div className="gallery-top">
             <div>
-              <div className="eyebrow">Fotografías de producto</div>
-              <h2 id="catalog-heading">Así se ven en persona.</h2>
+              <div className="eyebrow">Fotografías del negocio</div>
+              <h2 id="catalog-heading">Productos en el área de trabajo.</h2>
             </div>
-            <p>Imágenes compartidas por el negocio. Para confirmar el nombre y las especificaciones de cada pieza, consulta directamente.</p>
+            <p>Imágenes compartidas por Prefabricados Huimilpan. Revisa arriba el catálogo con los nombres y las medidas disponibles.</p>
           </div>
           <div className="gallery" aria-label="Galería de productos prefabricados">
             {productPhotos.map((photo, index) => (
@@ -355,46 +403,19 @@ function App() {
               </figure>
             ))}
           </div>
-          <p className="gallery-note">Las imágenes son referencias visuales; pregunta por características y especificaciones del producto.</p>
+          <p className="gallery-note">Las fotografías son referencias visuales. Solicita una cotización para confirmar medidas y disponibilidad.</p>
         </section>
 
-        <section className="section catalog-section" aria-labelledby="catalog-status-heading">
-          <div className="catalog-card">
-            <div className="catalog-copy">
-              <div className="eyebrow">Información clara</div>
-              <h2 id="catalog-status-heading">Cada obra tiene sus propios requerimientos.</h2>
-              <p>Por eso no publicamos medidas, precios ni disponibilidad sin confirmarlos. Envíanos los datos de tu proyecto y revisamos contigo la solicitud.</p>
+        <section className="section contact-section" id="contacto" aria-labelledby="contact-heading" data-testid="contact-section">
+          <div className="contact-panel">
+            <div className="contact-copy">
+              <div className="eyebrow">Contacto directo</div>
+              <h2 id="contact-heading">¿Tienes dudas sobre medidas o tu pedido?</h2>
+              <p>Comunícate con Prefabricados Huimilpan o envíanos los datos de tu obra desde el formulario de cotización.</p>
             </div>
-            <div className="catalog-status" data-testid="catalog-status" aria-label="Consulta directa para confirmar producto">
-              <Layers3 aria-hidden="true" />
-              <span>Consulta directa</span>
-            </div>
-          </div>
-        </section>
-
-        <section className="section buyer-section" aria-labelledby="buyer-heading" data-testid="buyer-section">
-          <div className="section-inner">
-            <div className="buyer-intro">
-              <div className="eyebrow">Directo al punto</div>
-              <h2 id="buyer-heading">Pide información con lo esencial.</h2>
-              <p>Para revisar tu solicitud, comparte algunos datos de la obra y el material que estás buscando.</p>
-            </div>
-            <div className="buyer-steps">
-              <article className="buyer-step">
-                <span className="step-num">01 — UBICACIÓN</span>
-                <h3>¿Dónde está tu proyecto?</h3>
-                <p>Indica la ciudad para que podamos entender el contexto de tu solicitud.</p>
-              </article>
-              <article className="buyer-step">
-                <span className="step-num">02 — PRODUCTO</span>
-                <h3>¿Qué necesitas?</h3>
-                <p>Escribe el tipo de pieza o comparte una referencia en el mensaje.</p>
-              </article>
-              <article className="buyer-step">
-                <span className="step-num">03 — DETALLES</span>
-                <h3>Cuéntanos sobre la obra</h3>
-                <p>Agrega cualquier información que nos ayude a comprender el requerimiento.</p>
-              </article>
+            <div className="contact-actions">
+              <a href={`tel:+52${BUSINESS_PHONE}`}><Phone aria-hidden="true" /><span><small>Llámanos</small>442 822 8310</span></a>
+              <a href={`mailto:${BUSINESS_EMAIL}`}><span className="contact-mail-icon" aria-hidden="true">@</span><span><small>Escríbenos</small>{BUSINESS_EMAIL}</span></a>
             </div>
           </div>
         </section>
@@ -404,9 +425,9 @@ function App() {
         <section className="closing" aria-label="Resumen de servicio" data-testid="closing-summary">
           <div className="closing-inner">
             <div>
-              <div className="eyebrow">Prefabricados · Querétaro</div>
-              <h2>¿Qué necesita tu obra?</h2>
-              <p>Cuéntanos del proyecto. Revisamos contigo los detalles de tu solicitud.</p>
+              <div className="eyebrow">Prefabricados Huimilpan · Querétaro</div>
+              <h2>Encuentra el prefabricado para tu obra.</h2>
+              <p>Semivigueta, bovedilla, casetón, placa de unicel y poste para cercar. Solicita una cotización.</p>
             </div>
             <a className="closing-mark" href="#cotizacion" aria-label="Solicitar cotización" data-testid="closing-quote-link">
               <ArrowUpRight aria-hidden="true" />
@@ -416,9 +437,13 @@ function App() {
       </main>
 
       <footer className="footer" data-testid="site-footer">
-        <p>Prefabricados en Querétaro</p>
+        <a className="footer-brand" href="#inicio" aria-label="Prefabricados Huimilpan, inicio">
+          <img src="/logo-ph.jpeg" alt="" width="44" height="44" />
+          <span>Prefabricados Huimilpan<small>Querétaro, México</small></span>
+        </a>
         <a href="#inicio" data-testid="footer-home">Volver al inicio</a>
-        <a href="mailto:prefabricadoshuimilpan@gmail.com">prefabricadoshuimilpan@gmail.com</a>
+        <a href={`tel:+52${BUSINESS_PHONE}`}>442 822 8310</a>
+        <a href={`mailto:${BUSINESS_EMAIL}`}>{BUSINESS_EMAIL}</a>
       </footer>
     </div>
   );

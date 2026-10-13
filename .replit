@@ -18,3 +18,8 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+VITE_HCAPTCHA_SITE_KEY = "a26c5dbc-237c-453a-925a-7c8a8388bce8"

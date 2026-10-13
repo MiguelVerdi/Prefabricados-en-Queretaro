@@ -80,7 +80,7 @@ router.post("/quotes", async (req, res): Promise<void> => {
 
   const subject = `Solicitud de cotización: ${quote.product.trim()}`;
   const message = [
-    "Nueva solicitud de cotización desde la página de Prefabricados en Querétaro",
+    "Nueva solicitud de cotización desde la página de Prefabricados Huimilpan",
     "",
     `Nombre: ${quote.name.trim()}`,
     `Correo: ${quote.email.trim()}`,
@@ -98,7 +98,7 @@ router.post("/quotes", async (req, res): Promise<void> => {
       method: "POST",
       body: {
         personalizations: [{ to: [{ email: recipient }], subject }],
-        from: { email: sender, name: "Prefabricados en Querétaro" },
+        from: { email: sender, name: "Prefabricados Huimilpan" },
         reply_to: { email: quote.email.trim(), name: quote.name.trim() },
         subject,
         content: [{ type: "text/plain", value: message }],
