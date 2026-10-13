@@ -570,6 +570,7 @@ h1 span { color: hsl(var(--accent)); }
 }
 .contact-actions a:hover { border-color: hsl(var(--primary)); }
 .contact-actions a > svg, .contact-mail-icon { width: 19px; height: 19px; flex: 0 0 auto; }
+.contact-actions .contact-whatsapp > svg { width: 22px; height: 22px; color: #25d366; }
 .contact-mail-icon {
   display: grid;
   place-items: center;
@@ -593,6 +594,26 @@ h1 span { color: hsl(var(--accent)); }
 .footer-brand { display: inline-flex; align-items: center; gap: 9px; font: 700 11px/1.35 var(--font-body); text-decoration: none; }
 .footer-brand img { width: 44px; height: 44px; object-fit: contain; }
 .footer-brand small { display: block; margin-top: 3px; color: hsl(var(--muted-foreground)); font-size: 9px; font-weight: 400; }
+.whatsapp-float {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 40;
+  display: grid;
+  width: 60px;
+  height: 60px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  box-shadow: 0 5px 18px rgb(0 0 0 / 22%);
+  text-decoration: none;
+  transition: background .2s, box-shadow .2s, transform .2s;
+}
+.whatsapp-float svg { width: 31px; height: 31px; }
+.whatsapp-float:hover { background: #1ebd5a; box-shadow: 0 8px 22px rgb(0 0 0 / 26%); transform: translateY(-2px); }
+.whatsapp-float:focus-visible { outline: 3px solid hsl(var(--primary)); outline-offset: 4px; }
 @media (max-width: 960px) {
   .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -612,4 +633,10 @@ h1 span { color: hsl(var(--accent)); }
   .contact-panel { grid-template-columns: 1fr; gap: 22px; }
   .contact-actions { min-width: 0; }
   .footer-brand { margin-right: auto; }
+  .whatsapp-float {
+    right: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    width: 56px;
+    height: 56px;
+  }
 }

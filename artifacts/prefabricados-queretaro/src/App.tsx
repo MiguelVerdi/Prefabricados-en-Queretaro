@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRequestQuote } from '@workspace/api-client-react';
 import { ArrowRight, ArrowUpRight, MapPin, Phone, Send } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 
 declare global {
   interface Window {
@@ -21,6 +22,7 @@ declare global {
 const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY;
 const BUSINESS_EMAIL = 'prefabricadoshuimilpan@gmail.com';
 const BUSINESS_PHONE = '4428228310';
+const WHATSAPP_URL = `https://wa.me/52${BUSINESS_PHONE}?text=${encodeURIComponent('Hola, vi su página de Prefabricados Huimilpan. Me gustaría recibir información y una cotización sobre sus productos.')}`;
 
 const productPhotos = [
   { name: 'IMG-20261012-WA0003.jpg', id: '1X8YTK_dBREnTDeUgRc7wyUEzRppohbWP', label: 'Armadura sobre elemento prefabricado', group: 'Elementos para losa' },
@@ -416,6 +418,10 @@ function App() {
             <div className="contact-actions">
               <a href={`tel:+52${BUSINESS_PHONE}`}><Phone aria-hidden="true" /><span><small>Llámanos</small>442 822 8310</span></a>
               <a href={`mailto:${BUSINESS_EMAIL}`}><span className="contact-mail-icon" aria-hidden="true">@</span><span><small>Escríbenos</small>{BUSINESS_EMAIL}</span></a>
+              <a className="contact-whatsapp" href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
+                <FaWhatsapp aria-hidden="true" />
+                <span><small>WhatsApp</small>Enviar mensaje</span>
+              </a>
             </div>
           </div>
         </section>
@@ -445,6 +451,17 @@ function App() {
         <a href={`tel:+52${BUSINESS_PHONE}`}>442 822 8310</a>
         <a href={`mailto:${BUSINESS_EMAIL}`}>{BUSINESS_EMAIL}</a>
       </footer>
+      <a
+        className="whatsapp-float"
+        href={WHATSAPP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Escribir a Prefabricados Huimilpan por WhatsApp"
+        title="Escríbenos por WhatsApp"
+        data-testid="whatsapp-float"
+      >
+        <FaWhatsapp aria-hidden="true" />
+      </a>
     </div>
   );
 }
