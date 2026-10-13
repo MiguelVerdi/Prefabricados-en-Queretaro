@@ -29,22 +29,22 @@ const GOOGLE_MAPS_EMBED_URL = `https://www.google.com/maps?q=${MAPS_QUERY}&z=16&
 const WHATSAPP_URL = `https://wa.me/52${BUSINESS_PHONE}?text=${encodeURIComponent('Hola, vi su página de Prefabricados Huimilpan. Me gustaría recibir información y una cotización sobre sus productos.')}`;
 
 const productPhotos = [
-  { name: 'IMG-20261012-WA0003.jpg', id: '1X8YTK_dBREnTDeUgRc7wyUEzRppohbWP', label: 'Armadura sobre elemento prefabricado', group: 'Elementos para losa' },
-  { name: 'IMG-20261012-WA0004.jpg', id: '15UtKRGNOnvniT45FrQPOCdY54zWVBlKz', label: 'Vista de conjunto en área de trabajo', group: 'Elementos para losa' },
-  { name: 'IMG-20261012-WA0005.jpg', id: '1xdXP02YEmPtMOp9RUvNlwgjQWlgyn45d', label: 'Detalle de piezas alineadas', group: 'Elementos para losa' },
-  { name: 'IMG-20261012-WA0006.jpg', id: '1yizq-EXGmdMKce0DqCtGWZFxqREKdpLZ', label: 'Acercamiento a la armadura', group: 'Elementos para losa' },
-  { name: 'IMG-20261012-WA0007.jpg', id: '1g3T0paFgJYTQy7kvsY9bdV769Xqkrynd', label: 'Detalle de fabricación', group: 'Elementos para losa' },
-  { name: 'IMG-20261012-WA0008.jpg', id: '1EuqFwK3E8nSUWOK40re1uV9nlvvjcwsB', label: 'Unión de armadura y base', group: 'Elementos para losa' },
-  { name: 'IMG-20261012-WA0009.jpg', id: '1z7ZRf8lUyNVdVckaV7HWY6TSqSXPsUPi', label: 'Piezas dispuestas en patio', group: 'Elementos para losa' },
-  { name: 'IMG-20261012-WA0010.jpg', id: '11xTZEdlNcXE7dxnS2a4_pStf4S_dSG8A', label: 'Elementos apilados', group: 'Elementos para losa' },
-  { name: 'IMG-20261012-WA0011.jpg', id: '16oV8G58C1x0qgKxOCJdNTO6DOPBWv3ga', label: 'Elementos en exterior', group: 'Elementos para losa' },
-  { name: 'IMG-20261012-WA0012.jpg', id: '1IWef4yiy2uOn44AaWUH3jaLnqpQMObUC', label: 'Preparación para traslado', group: 'Elementos para losa' },
-  { name: 'IMG-20261012-WA0013.jpg', id: '1sZ-WgLN-5WZLrQ_sHEQL87xXyq1-fKOZ', label: 'Vista cercana de piezas', group: 'Elementos para losa' },
-  { name: 'IMG-20261012-WA0014.jpg', id: '1fq157lXbT0KDKDa6Pon7C_iieesvvv4x', label: 'Piezas blancas apiladas', group: 'Piezas para construcción' },
-  { name: 'IMG-20261012-WA0015.jpg', id: '1LNE02HblZrqvuqWCa-xbOEDDYV1ekd0O', label: 'Detalle de piezas moldeadas', group: 'Piezas para construcción' },
-  { name: 'IMG-20261012-WA0016.jpg', id: '14wil90mh1eTzU3cAaaitwcgM7feByZBH', label: 'Piezas en espacio de resguardo', group: 'Piezas para construcción' },
-  { name: 'IMG-20261012-WA0017.jpg', id: '1ZpPuISRNtpFOVE_gbOtTt1JVObBgiF5v', label: 'Piezas apiladas', group: 'Piezas para construcción' },
-  { name: 'IMG-20261012-WA0018.jpg', id: '1X3vVvsXSvkShEaD3SyPiLzZi4-Ngn0Xq', label: 'Pieza individual', group: 'Piezas para construcción' },
+  { name: 'IMG-20261012-WA0003.jpg', id: '1X8YTK_dBREnTDeUgRc7wyUEzRppohbWP', label: 'Armadura sobre elemento prefabricado' },
+  { name: 'IMG-20261012-WA0004.jpg', id: '15UtKRGNOnvniT45FrQPOCdY54zWVBlKz', label: 'Vista de conjunto en área de trabajo' },
+  { name: 'IMG-20261012-WA0005.jpg', id: '1xdXP02YEmPtMOp9RUvNlwgjQWlgyn45d', label: 'Detalle de piezas alineadas' },
+  { name: 'IMG-20261012-WA0006.jpg', id: '1yizq-EXGmdMKce0DqCtGWZFxqREKdpLZ', label: 'Acercamiento a la armadura' },
+  { name: 'IMG-20261012-WA0007.jpg', id: '1g3T0paFgJYTQy7kvsY9bdV769Xqkrynd', label: 'Detalle de fabricación' },
+  { name: 'IMG-20261012-WA0008.jpg', id: '1EuqFwK3E8nSUWOK40re1uV9nlvvjcwsB', label: 'Unión de armadura y base' },
+  { name: 'IMG-20261012-WA0009.jpg', id: '1z7ZRf8lUyNVdVckaV7HWY6TSqSXPsUPi', label: 'Piezas dispuestas en patio' },
+  { name: 'IMG-20261012-WA0010.jpg', id: '11xTZEdlNcXE7dxnS2a4_pStf4S_dSG8A', label: 'Elementos apilados' },
+  { name: 'IMG-20261012-WA0011.jpg', id: '16oV8G58C1x0qgKxOCJdNTO6DOPBWv3ga', label: 'Elementos en exterior' },
+  { name: 'IMG-20261012-WA0012.jpg', id: '1IWef4yiy2uOn44AaWUH3jaLnqpQMObUC', label: 'Preparación para traslado' },
+  { name: 'IMG-20261012-WA0013.jpg', id: '1sZ-WgLN-5WZLrQ_sHEQL87xXyq1-fKOZ', label: 'Vista cercana de piezas' },
+  { name: 'IMG-20261012-WA0014.jpg', id: '1fq157lXbT0KDKDa6Pon7C_iieesvvv4x', label: 'Piezas blancas apiladas' },
+  { name: 'IMG-20261012-WA0015.jpg', id: '1LNE02HblZrqvuqWCa-xbOEDDYV1ekd0O', label: 'Detalle de piezas moldeadas' },
+  { name: 'IMG-20261012-WA0016.jpg', id: '14wil90mh1eTzU3cAaaitwcgM7feByZBH', label: 'Piezas en espacio de resguardo' },
+  { name: 'IMG-20261012-WA0017.jpg', id: '1ZpPuISRNtpFOVE_gbOtTt1JVObBgiF5v', label: 'Piezas apiladas' },
+  { name: 'IMG-20261012-WA0018.jpg', id: '1X3vVvsXSvkShEaD3SyPiLzZi4-Ngn0Xq', label: 'Pieza individual' },
 ];
 
 const products = [
@@ -340,17 +340,12 @@ function App() {
               <span className="hero-note">Atención local · Querétaro, México</span>
             </div>
           </div>
-          <div className="hero-photo" aria-label="Elementos prefabricados fotografiados en el área de trabajo">
+          <div className="hero-photo" role="img" aria-label="Elementos prefabricados en el área de trabajo">
             <img
               src="https://drive.google.com/thumbnail?id=1X8YTK_dBREnTDeUgRc7wyUEzRppohbWP&sz=w1600"
-              alt="Elementos prefabricados con armadura expuestos en un patio de trabajo"
+              alt=""
               fetchPriority="high"
             />
-            <span className="photo-index">FOTO DE PRODUCTO</span>
-            <div className="photo-caption">
-              <strong>Prefabricados vistos de cerca, en el trabajo real.</strong>
-              <span>Registro fotográfico</span>
-            </div>
             <span className="hero-photo-frame" aria-hidden="true" />
           </div>
         </section>
@@ -386,30 +381,18 @@ function App() {
           </div>
         </section>
 
-        <section className="section gallery-section" id="galeria" aria-labelledby="catalog-heading" data-testid="catalog-section">
-          <div className="gallery-top">
-            <div>
-              <div className="eyebrow">Fotografías del negocio</div>
-              <h2 id="catalog-heading">Productos en el área de trabajo.</h2>
-            </div>
-            <p>Imágenes compartidas por Prefabricados Huimilpan. Revisa arriba el catálogo con los nombres y las medidas disponibles.</p>
-          </div>
+        <section className="section gallery-section" id="galeria" aria-label="Galería de fotografías de Prefabricados Huimilpan" data-testid="catalog-section">
           <div className="gallery" aria-label="Galería de productos prefabricados">
             {productPhotos.map((photo, index) => (
-              <figure className="gallery-item" key={photo.id} data-testid={`product-photo-${index + 1}`}>
+              <figure className="gallery-item" key={photo.id} aria-label={photo.label} data-testid={`product-photo-${index + 1}`}>
                 <img
                   src={`https://drive.google.com/thumbnail?id=${photo.id}&sz=w1600`}
-                  alt={photo.label}
+                  alt=""
                   loading={index === 0 ? 'eager' : 'lazy'}
                 />
-                <figcaption className="gallery-caption">
-                  <strong>{photo.label}</strong>
-                  <span>{photo.group}</span>
-                </figcaption>
               </figure>
             ))}
           </div>
-          <p className="gallery-note">Las fotografías son referencias visuales. Solicita una cotización para confirmar medidas y disponibilidad.</p>
         </section>
 
         <section className="section contact-section" id="contacto" aria-labelledby="contact-heading" data-testid="contact-section">
