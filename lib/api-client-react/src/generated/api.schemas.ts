@@ -19,23 +19,14 @@ export interface QuoteRequestInput {
   email: string;
   /** @maxLength 40 */
   phone?: string;
-  /**
-     * @minLength 2
-     * @maxLength 100
-     */
-  city: string;
-  /**
-     * @minLength 2
-     * @maxLength 120
-     */
-  product: string;
+  /** @maxLength 100 */
+  city?: string;
+  /** @maxLength 120 */
+  product?: string;
   /** @maxLength 100 */
   quantity?: string;
-  /**
-     * @minLength 10
-     * @maxLength 2000
-     */
-  message: string;
+  /** @maxLength 2000 */
+  message?: string;
   /**
      * @minLength 1
      * @maxLength 4096

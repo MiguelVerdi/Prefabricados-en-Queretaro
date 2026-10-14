@@ -196,9 +196,15 @@ function QuoteRequestForm() {
     try {
       const response = await requestQuote.mutateAsync({
         data: {
-          ...data,
+          name: data.name,
+          email: data.email,
           ...(data.phone ? { phone: data.phone } : {}),
+          ...(data.city ? { city: data.city } : {}),
+          ...(data.product ? { product: data.product } : {}),
           ...(data.quantity ? { quantity: data.quantity } : {}),
+          ...(data.message ? { message: data.message } : {}),
+          captchaToken,
+          ...(website ? { website } : {}),
         },
       });
       if (!response.success) {
@@ -220,7 +226,7 @@ function QuoteRequestForm() {
         <div className="quote-intro">
           <div className="eyebrow">Hablemos de tu obra</div>
           <h2 id="quote-heading">Solicita una cotización.</h2>
-          <p>Indícanos qué prefabricado necesitas, las medidas y la ciudad de tu proyecto. Te responderemos para revisar los detalles contigo.</p>
+      <p>Si ya lo sabes, cuéntanos qué prefabricado necesitas y en qué ciudad está tu obra. Si aún no tienes esos datos, déjalos en blanco y te contactaremos.</p>
           <div className="quote-aside">
             <span className="quote-aside-mark"><MapPin aria-hidden="true" /></span>
             <span><strong>Atención en Querétaro</strong><small>Querétaro, México</small></span>
@@ -248,25 +254,25 @@ function QuoteRequestForm() {
               <input id="quote-phone" name="phone" type="tel" autoComplete="tel" maxLength={40} data-testid="input-quote-phone" />
             </div>
             <div className="form-field">
-              <label htmlFor="quote-city">Ciudad <span aria-hidden="true">*</span></label>
-              <input id="quote-city" name="city" autoComplete="address-level2" minLength={2} maxLength={100} required data-testid="input-quote-city" />
+              <label htmlFor="quote-city">Ciudad <span className="optional-label">(opcional)</span></label>
+              <input id="quote-city" name="city" autoComplete="address-level2" maxLength={100} data-testid="input-quote-city" />
             </div>
             <div className="form-field">
-              <label htmlFor="quote-product">Producto que buscas <span aria-hidden="true">*</span></label>
-              <input id="quote-product" name="product" list="quote-products" placeholder="Ej. semivigueta o casetón" minLength={2} maxLength={120} required aria-describedby="product-hint" data-testid="input-quote-product" />
+              <label htmlFor="quote-product">Producto que buscas <span className="optional-label">(opcional)</span></label>
+              <input id="quote-product" name="product" list="quote-products" placeholder="Ej. semivigueta o casetón" maxLength={120} aria-describedby="product-hint" data-testid="input-quote-product" />
               <datalist id="quote-products">
                 {products.map((product) => <option key={product.name} value={product.name} />)}
               </datalist>
-              <small id="product-hint">Puedes elegir un producto o escribir una medida especial.</small>
+              <small id="product-hint">Puedes elegir un producto, escribir una medida especial o dejarlo en blanco.</small>
             </div>
             <div className="form-field">
               <label htmlFor="quote-quantity">Cantidad aproximada <span className="optional-label">(opcional)</span></label>
               <input id="quote-quantity" name="quantity" maxLength={100} data-testid="input-quote-quantity" />
             </div>
             <div className="form-field form-field-wide">
-              <label htmlFor="quote-message">Detalles del proyecto o mensaje <span aria-hidden="true">*</span></label>
-              <textarea id="quote-message" name="message" minLength={10} maxLength={2000} rows={5} required aria-describedby="message-hint" data-testid="input-quote-message" />
-              <small id="message-hint">Incluye cualquier detalle que ayude a entender lo que necesitas.</small>
+              <label htmlFor="quote-message">Detalles del proyecto o mensaje <span className="optional-label">(opcional)</span></label>
+              <textarea id="quote-message" name="message" maxLength={2000} rows={5} aria-describedby="message-hint" data-testid="input-quote-message" />
+              <small id="message-hint">Puedes añadir medidas u otros detalles, o dejarlo en blanco.</small>
             </div>
           </div>
           <div className="honeypot-field" aria-hidden="true">

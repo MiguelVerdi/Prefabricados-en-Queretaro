@@ -28,15 +28,12 @@ export const requestQuoteBodyEmailMax = 254;
 
 export const requestQuoteBodyPhoneMax = 40;
 
-export const requestQuoteBodyCityMin = 2;
 export const requestQuoteBodyCityMax = 100;
 
-export const requestQuoteBodyProductMin = 2;
 export const requestQuoteBodyProductMax = 120;
 
 export const requestQuoteBodyQuantityMax = 100;
 
-export const requestQuoteBodyMessageMin = 10;
 export const requestQuoteBodyMessageMax = 2000;
 
 export const requestQuoteBodyCaptchaTokenMax = 4096;
@@ -49,10 +46,10 @@ export const RequestQuoteBody = zod.object({
   "name": zod.string().min(requestQuoteBodyNameMin).max(requestQuoteBodyNameMax),
   "email": zod.string().email().max(requestQuoteBodyEmailMax),
   "phone": zod.string().max(requestQuoteBodyPhoneMax).optional(),
-  "city": zod.string().min(requestQuoteBodyCityMin).max(requestQuoteBodyCityMax),
-  "product": zod.string().min(requestQuoteBodyProductMin).max(requestQuoteBodyProductMax),
+  "city": zod.string().max(requestQuoteBodyCityMax).optional(),
+  "product": zod.string().max(requestQuoteBodyProductMax).optional(),
   "quantity": zod.string().max(requestQuoteBodyQuantityMax).optional(),
-  "message": zod.string().min(requestQuoteBodyMessageMin).max(requestQuoteBodyMessageMax),
+  "message": zod.string().max(requestQuoteBodyMessageMax).optional(),
   "captchaToken": zod.string().min(1).max(requestQuoteBodyCaptchaTokenMax),
   "website": zod.string().max(requestQuoteBodyWebsiteMax).optional()
 })

@@ -78,19 +78,22 @@ router.post("/quotes", async (req, res): Promise<void> => {
     return;
   }
 
-  const subject = `Solicitud de cotización: ${quote.product.trim()}`;
+  const requestedProduct = quote.product?.trim();
+  const subject = requestedProduct
+    ? `Solicitud de cotización: ${requestedProduct}`
+    : "Solicitud de información y cotización";
   const message = [
     "Nueva solicitud de cotización desde la página de Prefabricados Huimilpan",
     "",
     `Nombre: ${quote.name.trim()}`,
     `Correo: ${quote.email.trim()}`,
     `Teléfono: ${quote.phone?.trim() || "No proporcionado"}`,
-    `Ciudad: ${quote.city.trim()}`,
-    `Producto solicitado: ${quote.product.trim()}`,
+    `Ciudad: ${quote.city?.trim() || "No especificada"}`,
+    `Producto solicitado: ${requestedProduct || "No especificado"}`,
     `Cantidad aproximada: ${quote.quantity?.trim() || "No especificada"}`,
     "",
     "Detalles del proyecto:",
-    quote.message.trim(),
+    quote.message?.trim() || "Sin detalles adicionales.",
   ].join("\n");
 
   try {

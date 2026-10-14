@@ -77,18 +77,15 @@ components:
           maxLength: 40
         city:
           type: string
-          minLength: 2
           maxLength: 100
         product:
           type: string
-          minLength: 2
           maxLength: 120
         quantity:
           type: string
           maxLength: 100
         message:
           type: string
-          minLength: 10
           maxLength: 2000
         captchaToken:
           type: string
@@ -100,9 +97,6 @@ components:
       required:
         - name
         - email
-        - city
-        - product
-        - message
         - captchaToken
     QuoteRequestResponse:
       type: object
