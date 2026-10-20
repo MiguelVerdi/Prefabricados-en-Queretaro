@@ -1,9 +1,7 @@
-import { ReplitConnectors } from "@replit/connectors-sdk";
 import { RequestQuoteBody, RequestQuoteResponse } from "@workspace/api-zod";
 import { Router, type IRouter } from "express";
 
 const router: IRouter = Router();
-const sendgrid = new ReplitConnectors();
 
 router.post("/quotes", async (req, res): Promise<void> => {
   const parsed = RequestQuoteBody.safeParse(req.body);
@@ -28,13 +26,24 @@ router.post("/quotes", async (req, res): Promise<void> => {
   const hcaptchaSecret = process.env.HCAPTCHA_SECRET_KEY;
   const recipient = process.env.QUOTE_RECIPIENT_EMAIL;
   const sender = process.env.QUOTE_SENDER_EMAIL;
+  const emailProvider =
+    process.env.EMAIL_PROVIDER ?? (process.env.REPL_ID ? "replit" : "sendgrid");
+  const sendgridApiKey = process.env.SENDGRID_API_KEY;
 
-  if (!hcaptchaSecret || !recipient || !sender) {
+  if (
+    !hcaptchaSecret ||
+    !recipient ||
+    !sender ||
+    !["replit", "sendgrid"].includes(emailProvider) ||
+    (emailProvider === "sendgrid" && !sendgridApiKey)
+  ) {
     req.log.error(
       {
         hcaptchaConfigured: Boolean(hcaptchaSecret),
         recipientConfigured: Boolean(recipient),
         senderConfigured: Boolean(sender),
+        emailProvider,
+        sendgridApiKeyConfigured: Boolean(sendgridApiKey),
       },
       "Quote request delivery is not configured",
     );
@@ -97,20 +106,42 @@ router.post("/quotes", async (req, res): Promise<void> => {
   ].join("\n");
 
   try {
-    const response = await sendgrid.proxy("sendgrid", "/v3/mail/send", {
-      method: "POST",
-      body: {
-        personalizations: [{ to: [{ email: recipient }], subject }],
-        from: { email: sender, name: "Prefabricados Huimilpan" },
-        reply_to: { email: quote.email.trim(), name: quote.name.trim() },
-        subject,
-        content: [{ type: "text/plain", value: message }],
-      },
-    });
+    const mail = {
+      personalizations: [{ to: [{ email: recipient }], subject }],
+      from: { email: sender, name: "Prefabricados Huimilpan" },
+      reply_to: { email: quote.email.trim(), name: quote.name.trim() },
+      subject,
+      content: [{ type: "text/plain", value: message }],
+    };
 
-    if (!response.ok) {
+    let responseOk: boolean;
+    let responseStatus: number;
+
+    if (emailProvider === "sendgrid") {
+      const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${sendgridApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(mail),
+      });
+      responseOk = response.ok;
+      responseStatus = response.status;
+    } else {
+      const { ReplitConnectors } = await import("@replit/connectors-sdk");
+      const connectors = new ReplitConnectors();
+      const response = await connectors.proxy("sendgrid", "/v3/mail/send", {
+        method: "POST",
+        body: mail,
+      });
+      responseOk = response.ok;
+      responseStatus = response.status;
+    }
+
+    if (!responseOk) {
       req.log.error(
-        { statusCode: response.status },
+        { statusCode: responseStatus, emailProvider },
         "SendGrid rejected a quote email",
       );
       res.status(503).json({

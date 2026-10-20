@@ -5,6 +5,10 @@ import router from "./routes";
 import { logger } from "./lib/logger";
 
 const app: Express = express();
+const corsAllowedOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 app.use(
   pinoHttp({
@@ -25,7 +29,13 @@ app.use(
     },
   }),
 );
-app.use(cors());
+app.use(
+  cors({
+    // Set a comma-separated allowlist in GCP. Leaving it unset preserves the
+    // existing Replit preview behavior while the site is still hosted there.
+    origin: corsAllowedOrigins.length > 0 ? corsAllowedOrigins : true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
