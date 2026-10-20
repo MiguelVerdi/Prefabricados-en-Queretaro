@@ -1,0 +1,24 @@
+# Only the API and its workspace dependencies belong in the build context.
+**
+!Dockerfile
+!.dockerignore
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!tsconfig.base.json
+!.npmrc
+!lib/
+!lib/**
+!artifacts/
+!artifacts/api-server/
+!artifacts/api-server/**
+**/node_modules
+**/dist
+**/*.tsbuildinfo
+**/.replit-artifact
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/*credentials*.json
+**/*service-account*.json
