@@ -342,7 +342,7 @@ function App() {
         <section className="hero" id="inicio" aria-labelledby="main-heading" data-testid="hero">
           <div className="hero-content">
             <div className="eyebrow reveal">Prefabricados Huimilpan · Querétaro</div>
-            <h1 className="reveal-delay" id="main-heading">Prefabricados para <span>tu obra.</span></h1>
+            <h1 className="reveal-delay" id="main-heading">Prefabricados en <span>Querétaro.</span></h1>
             <p className="hero-copy reveal-delay">
               Semivigueta, bovedillas, casetón, placa de unicel y postes para cercar. Consulta medidas y pide una cotización para tu obra en Querétaro.
             </p>
