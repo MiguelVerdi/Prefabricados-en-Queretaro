@@ -8,3 +8,9 @@ El usuario quiere una página comercial convencional y fácil de entender para p
 **Why:** El usuario pidió explícitamente este estilo y señaló que el diseño anterior se veía demasiado hecho con IA.
 
 **How to apply:** En futuras iteraciones, conservar el enfoque fotográfico azul/blanco con acento sobrio, presentar con claridad los productos y el contacto, y no inventar especificaciones, precios, garantías, dirección ni tiempos de entrega.
+
+La ubicación de La Ceja, Huimilpan, es adicional a la de Lomas de Casa Blanca; no se trata de una mudanza.
+
+**Why:** El usuario la presentó como “También estamos”, no como sustitución de la dirección anterior.
+
+**How to apply:** Conservar ambas ubicaciones al actualizar el contacto. Los mapas de la web basados en dirección no equivalen a crear o verificar fichas de Google Maps.

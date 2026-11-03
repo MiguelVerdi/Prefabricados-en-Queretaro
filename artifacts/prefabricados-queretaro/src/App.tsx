@@ -22,10 +22,18 @@ declare global {
 const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY;
 const BUSINESS_EMAIL = 'prefabricadoshuimilpan@gmail.com';
 const BUSINESS_PHONE = '4428228310';
-const BUSINESS_ADDRESS = 'C. 27 830, Lomas de Casa Blanca, 76080 Santiago de Querétaro, Qro., México';
-const MAPS_QUERY = encodeURIComponent(BUSINESS_ADDRESS);
-const GOOGLE_MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${MAPS_QUERY}`;
-const GOOGLE_MAPS_EMBED_URL = `https://www.google.com/maps?q=${MAPS_QUERY}&z=16&output=embed`;
+const BUSINESS_LOCATIONS = [
+  {
+    id: 'queretaro',
+    name: 'Lomas de Casa Blanca, Querétaro',
+    address: 'C. 27 830, Lomas de Casa Blanca, 76080 Santiago de Querétaro, Qro., México',
+  },
+  {
+    id: 'huimilpan',
+    name: 'La Ceja, Huimilpan',
+    address: 'Calle Querétaro 465, La Ceja, Huimilpan, Querétaro, México',
+  },
+];
 const WHATSAPP_URL = `https://wa.me/52${BUSINESS_PHONE}?text=${encodeURIComponent('Hola, vi su página de Prefabricados Huimilpan. Me gustaría recibir información y una cotización sobre sus productos.')}`;
 
 const productPhotos = [
@@ -417,15 +425,16 @@ function App() {
               </a>
             </div>
           </div>
-          <div className="location-panel" id="ubicacion" aria-labelledby="location-heading" data-testid="business-location">
+          {BUSINESS_LOCATIONS.map((location, index) => (
+          <div className="location-panel" id={index === 0 ? 'ubicacion' : `ubicacion-${location.id}`} aria-labelledby={`location-heading-${location.id}`} data-testid={index === 0 ? 'business-location' : `business-location-${location.id}`} key={location.id}>
             <div className="location-info">
-              <div className="eyebrow">Ubicación</div>
-              <h3 id="location-heading">Encuéntranos en Querétaro</h3>
+              <div className="eyebrow">{index === 0 ? 'Ubicación en Querétaro' : 'También estamos en Huimilpan'}</div>
+              <h3 id={`location-heading-${location.id}`}>{location.name}</h3>
               <address className="business-address">
                 <MapPin aria-hidden="true" />
-                <span>{BUSINESS_ADDRESS}</span>
+                <span>{location.address}</span>
               </address>
-              <a className="maps-link" href={GOOGLE_MAPS_URL} target="_blank" rel="noopener noreferrer">
+              <a className="maps-link" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`} target="_blank" rel="noopener noreferrer">
                 <MapPin aria-hidden="true" />
                 Ver ubicación en Google Maps
                 <ArrowUpRight aria-hidden="true" />
@@ -433,14 +442,15 @@ function App() {
             </div>
             <div className="location-map">
               <iframe
-                title="Mapa de Prefabricados Huimilpan en Lomas de Casa Blanca, Querétaro"
-                src={GOOGLE_MAPS_EMBED_URL}
+                title={`Mapa de Prefabricados Huimilpan en ${location.name}`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(location.address)}&z=16&output=embed`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 allowFullScreen
               />
             </div>
           </div>
+          ))}
         </section>
 
         <QuoteRequestForm />
