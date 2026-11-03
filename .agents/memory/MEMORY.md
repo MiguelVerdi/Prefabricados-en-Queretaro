@@ -1,1 +1,2 @@
 - [Prefabricados site style](prefabricados-site-style.md) — Mantener una presentación comercial local, fotográfica y directa, con el formulario de cotización claramente delimitado.
+- [Alojamiento en GCP](gcp-hosting-scope.md) — Sin Firebase: alojar página y API juntas en Cloud Run; distinguir preparación de código de un despliegue real.
