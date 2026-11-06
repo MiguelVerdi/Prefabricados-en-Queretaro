@@ -27,11 +27,13 @@ const BUSINESS_LOCATIONS = [
     id: 'queretaro',
     name: 'Lomas de Casa Blanca, Querétaro',
     address: 'C. 27 830, Lomas de Casa Blanca, 76080 Santiago de Querétaro, Qro., México',
+    mapQuery: 'C. 27 830, Lomas de Casa Blanca, 76080 Santiago de Querétaro, Qro., México',
   },
   {
     id: 'huimilpan',
     name: 'La Ceja, Huimilpan',
     address: 'Calle Querétaro 465, La Ceja, Huimilpan, Querétaro, México',
+    mapQuery: '20.3737048,-100.2645429',
   },
 ];
 const WHATSAPP_URL = `https://wa.me/52${BUSINESS_PHONE}?text=${encodeURIComponent('Hola, vi su página de Prefabricados Huimilpan. Me gustaría recibir información y una cotización sobre sus productos.')}`;
@@ -434,7 +436,7 @@ function App() {
                 <MapPin aria-hidden="true" />
                 <span>{location.address}</span>
               </address>
-              <a className="maps-link" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`} target="_blank" rel="noopener noreferrer">
+              <a className="maps-link" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.mapQuery)}`} target="_blank" rel="noopener noreferrer">
                 <MapPin aria-hidden="true" />
                 Ver ubicación en Google Maps
                 <ArrowUpRight aria-hidden="true" />
@@ -443,7 +445,7 @@ function App() {
             <div className="location-map">
               <iframe
                 title={`Mapa de Prefabricados Huimilpan en ${location.name}`}
-                src={`https://www.google.com/maps?q=${encodeURIComponent(location.address)}&z=16&output=embed`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(location.mapQuery)}&z=16&output=embed`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 allowFullScreen
